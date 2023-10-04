@@ -1,7 +1,5 @@
 import app from "./app.js";
 
-(async () => {
-  await app().listen({
-    port: 3000,
-  });
-})();
+await app().listen({
+  port: 3000,
+});
