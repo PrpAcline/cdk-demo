@@ -1,5 +1,8 @@
 import fastify from "fastify";
 import type http from "node:http";
+import * as dynamo from "@aws-sdk/client-dynamodb";
+import { DynamoDBDocumentClient } from "@aws-sdk/lib-dynamodb";
+import { createDynamoDbClient } from "./dynamodb.js";
 
 type FastifyConfig = fastify.FastifyHttpOptions<
   http.Server,
@@ -10,7 +13,7 @@ const initApp = (config: FastifyConfig) => {
   const app = fastify(config);
 
   app.get("/up", async () => {
-    return { up: true };
+    return { success: true };
   });
 
   app.get("/stores", async () => {
@@ -59,6 +62,19 @@ const initApp = (config: FastifyConfig) => {
           price: 7.5,
         },
       ],
+    };
+  });
+
+  app.get("/test", async () => {
+    const dynamoDb = createDynamoDbClient();
+
+    const ddbDocClient = DynamoDBDocumentClient.from(dynamoDb);
+
+    const response = await dynamoDb.send(new dynamo.ListTablesCommand({}));
+
+    return {
+      success: true,
+      response,
     };
   });
 
