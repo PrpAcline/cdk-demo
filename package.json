@@ -10,6 +10,11 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@fastify/aws-lambda": "^3.3.0",
+    "aws-cdk": "^2.99.1",
+    "aws-cdk-lib": "^2.99.1",
+    "constructs": "^10.2.70",
+    "esbuild": "^0.19.4",
     "fastify": "^4.23.2"
   },
   "devDependencies": {
