@@ -13,7 +13,8 @@ WORKDIR /usr/src/app
 # Copy the rest of the source files into the image.
 COPY . .
 
-RUN npm install
+RUN  --mount=type=cache,target=/root/.npm \
+     npm install
 
 RUN npm run build
 
@@ -25,10 +26,10 @@ ENV NODE_ENV production
 WORKDIR /usr/src/app
 
 COPY --from=build /usr/src/app/build ./build
+COPY --from=build /usr/src/app/package.json .
+COPY --from=build /usr/src/app/package-lock.json .
 
-RUN --mount=type=bind,source=package.json,target=package.json \
-    --mount=type=bind,source=package-lock.json,target=package-lock.json \
-    --mount=type=cache,target=/root/.npm \
+RUN  --mount=type=cache,target=/root/.npm \
     npm ci --omit=dev
 
 # Run the application as a non-root user.
