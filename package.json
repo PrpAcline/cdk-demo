@@ -1,16 +1,12 @@
 {
   "name": "cdk-demo",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
   "type": "module",
   "scripts": {
     "dev": "ts-node --esm src/dev.ts",
     "test": "vitest",
     "cdk": "cdk"
   },
-  "author": "",
-  "license": "ISC",
   "dependencies": {
     "@fastify/aws-lambda": "^3.3.0",
     "aws-cdk": "^2.99.1",
