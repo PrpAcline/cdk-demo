@@ -70,7 +70,9 @@ const initApp = (config: FastifyConfig) => {
 
     const ddbDocClient = DynamoDBDocumentClient.from(dynamoDb);
 
-    const response = await dynamoDb.send(new dynamo.ListTablesCommand({}));
+    const response = await ddbDocClient.send(
+      new dynamo.ScanCommand({ TableName: process.env.DYNAMODB_TABLE_NAME }),
+    );
 
     return {
       success: true,

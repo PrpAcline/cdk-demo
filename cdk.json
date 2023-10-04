@@ -1,3 +1,4 @@
 {
-  "app": "ts-node --esm infra/main.ts"
+  "app": "ts-node --esm infra/main.ts",
+  "watch": ["infra/**/*", "src/**/*"]
 }

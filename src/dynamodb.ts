@@ -6,7 +6,8 @@ const getDynamoEndpoint = () => {
   }
 
   if (process.env.NODE_ENV === "production") {
-    return `https://dynamodb.${process.env.AWS_REGION}.amazonaws.com`;
+    // undefined will use the default endpoint for aws
+    return undefined;
   }
 
   return "http://localhost:8000";
