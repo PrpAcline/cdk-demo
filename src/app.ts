@@ -1,9 +1,13 @@
-import fastify from "fastify";
+import fastify, { FastifyServerFactory } from "fastify";
+import type http from "node:http";
 
-const initApp = () => {
-  const app = fastify({
-    logger: true,
-  });
+type FastifyConfig = fastify.FastifyHttpOptions<
+  http.Server,
+  fastify.FastifyBaseLogger
+>;
+
+const initApp = (config: FastifyConfig) => {
+  const app = fastify(config);
 
   app.get("/", async (request, reply) => {
     return { hello: "world" };
