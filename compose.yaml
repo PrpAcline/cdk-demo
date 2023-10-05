@@ -7,6 +7,7 @@ services:
       DOCKER_COMPOSE: true
       AWS_ACCESS_KEY_ID: "DUMMYIDEXAMPLE"
       AWS_SECRET_ACCESS_KEY: "DUMMYEXAMPLEKEY"
+      DYNAMODB_TABLE_NAME: "fantastic-tacos"
       REGION: "us-east-2"
     ports:
       - 3000:3000
