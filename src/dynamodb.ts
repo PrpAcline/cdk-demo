@@ -1,4 +1,5 @@
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
+import { DynamoDBDocumentClient } from "@aws-sdk/lib-dynamodb";
 
 const getDynamoEndpoint = () => {
   if (process.env.DOCKER_COMPOSE === "true") {
@@ -14,8 +15,15 @@ const getDynamoEndpoint = () => {
 };
 
 export const createDynamoDbClient = () => {
-  return new DynamoDBClient({
-    region: process.env.AWS_REGION || "us-east-2",
-    endpoint: getDynamoEndpoint(),
-  });
+  return DynamoDBDocumentClient.from(
+    new DynamoDBClient({
+      region: process.env.AWS_REGION || "us-east-2",
+      endpoint: getDynamoEndpoint(),
+    }),
+    {
+      marshallOptions: {
+        convertEmptyValues: true,
+      },
+    },
+  );
 };

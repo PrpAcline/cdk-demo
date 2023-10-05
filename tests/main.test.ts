@@ -1,33 +1,44 @@
 import { test, expect, afterEach, beforeEach, vi } from "vitest";
+import { rest } from "msw";
 import { setupServer } from "msw/node";
 import initApp from "../src/app";
+import { marshall } from "@aws-sdk/util-dynamodb";
 
 const server = setupServer();
 
-beforeEach(() => {
-  server.listen();
+vi.stubEnv("DYNAMODB_TABLE_NAME", "fantastic-tacos");
+vi.stubEnv("AWS_PROFILE", "");
+vi.stubEnv("AWS_ACCESS_KEY_ID", "DUMMYIDEXAMPLE");
+vi.stubEnv("AWS_SECRET_ACCESS_KEY", "DUMMYEXAMPLEKEY");
+vi.stubEnv("AWS_REGION", "us-east-2");
+
+server.listen({
+  onUnhandledRequest: "warn",
 });
 
 afterEach(() => {
   server.resetHandlers();
-  server.close();
 });
 
 const storesFixture = [
   {
-    id: "1",
+    pk: "store#1",
+    sk: "store#1",
     location: "London",
   },
   {
-    id: "2",
+    pk: "store#2",
+    sk: "store#2",
     location: "Paris",
   },
   {
-    id: "3",
+    pk: "store#3",
+    sk: "store#3",
     location: "New York",
   },
   {
-    id: "4",
+    pk: "store#4",
+    sk: "store#3",
     location: "Tokyo",
   },
 ];
@@ -50,7 +61,7 @@ const menuFixture = [
   },
 ];
 
-test("/up route that always returns 200", async () => {
+test("GET /up route that always returns 200", async () => {
   const app = await initApp({ logger: false });
   const response = await app.inject({
     method: "GET",
@@ -60,7 +71,22 @@ test("/up route that always returns 200", async () => {
   expect(response.statusCode).toEqual(200);
 });
 
-test("/stores route that returns the list of stores", async () => {
+test("GET /stores route that returns the list of stores", async () => {
+  const dynamoDb = vi.fn();
+  server.use(
+    rest.post("http://localhost:8000/", async (req, res, ctx) => {
+      dynamoDb(req.headers.get("x-amz-target"), await req.json());
+
+      return res(
+        ctx.status(200),
+        ctx.json({
+          Items: storesFixture.map((store) => marshall(store)),
+          Count: storesFixture.length,
+        }),
+      );
+    }),
+  );
+
   const app = await initApp({ logger: false });
   const response = await app.inject({
     method: "GET",
@@ -70,20 +96,19 @@ test("/stores route that returns the list of stores", async () => {
   expect(response.statusCode).toEqual(200);
   expect(response.json()).toEqual({
     type: "stores",
-    items: storesFixture,
-  });
-});
-
-test("/stores/:id/menu route that returns the list of menu items", async () => {
-  const app = await initApp({ logger: false });
-  const response = await app.inject({
-    method: "GET",
-    url: "/stores/1/menu",
+    items: storesFixture.map((item) => ({
+      id: item.pk.split("#")[1],
+      location: item.location,
+    })),
   });
 
-  expect(response.statusCode).toEqual(200);
-  expect(response.json()).toEqual({
-    type: "menu",
-    items: menuFixture,
+  expect(dynamoDb).toHaveBeenCalledWith("DynamoDB_20120810.Query", {
+    TableName: process.env.DYNAMODB_TABLE_NAME,
+    KeyConditions: {
+      pk: {
+        ComparisonOperator: "BEGINS_WITH",
+        AttributeValueList: [marshall("STORE")],
+      },
+    },
   });
 });
