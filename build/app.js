@@ -1,8 +1,25 @@
 import fastify from "fastify";
-const initApp = (config) => {
+import * as dynamo from "@aws-sdk/client-dynamodb";
+import { DynamoDBDocumentClient } from "@aws-sdk/lib-dynamodb";
+import { createDynamoDbClient } from "./dynamodb.js";
+import swagger from "@fastify/swagger";
+import swaggerUI from "@fastify/swagger-ui";
+const initApp = async (config) => {
     const app = fastify(config);
+    // @ts-ignore - fastify-swagger types are wrong
+    await app.register(swagger, { openapi: { info: { title: "API" } } });
+    await app.register(swaggerUI, {
+        theme: {
+            css: [
+                {
+                    filename: "theme.css",
+                    content: ".topbar-wrapper img { display: none; }",
+                },
+            ],
+        },
+    });
     app.get("/up", async () => {
-        return { up: true };
+        return { success: true };
     });
     app.get("/stores", async () => {
         return {
@@ -48,6 +65,15 @@ const initApp = (config) => {
                     price: 7.5,
                 },
             ],
+        };
+    });
+    app.get("/test", async () => {
+        const dynamoDb = createDynamoDbClient();
+        const ddbDocClient = DynamoDBDocumentClient.from(dynamoDb);
+        const response = await ddbDocClient.send(new dynamo.ScanCommand({ TableName: process.env.DYNAMODB_TABLE_NAME }));
+        return {
+            success: true,
+            response,
         };
     });
     return app;

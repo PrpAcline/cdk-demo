@@ -8,5 +8,5 @@
     "skipLibCheck": true
   },
   "include": ["src/**/*"],
-  "exclude": ["src/dev.ts", "src/lambda.ts"]
+  "exclude": ["src/dev.ts"]
 }

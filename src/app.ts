@@ -3,14 +3,28 @@ import type http from "node:http";
 import * as dynamo from "@aws-sdk/client-dynamodb";
 import { DynamoDBDocumentClient } from "@aws-sdk/lib-dynamodb";
 import { createDynamoDbClient } from "./dynamodb.js";
+import swagger from "@fastify/swagger";
+import swaggerUI from "@fastify/swagger-ui";
 
 type FastifyConfig = fastify.FastifyHttpOptions<
   http.Server,
   fastify.FastifyBaseLogger
 >;
 
-const initApp = (config: FastifyConfig) => {
+const initApp = async (config: FastifyConfig) => {
   const app = fastify(config);
+  // @ts-ignore - fastify-swagger types are wrong
+  await app.register(swagger, { openapi: { info: { title: "API" } } });
+  await app.register(swaggerUI, {
+    theme: {
+      css: [
+        {
+          filename: "theme.css",
+          content: ".topbar-wrapper img { display: none; }",
+        },
+      ],
+    },
+  });
 
   app.get("/up", async () => {
     return { success: true };
