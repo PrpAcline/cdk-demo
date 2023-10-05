@@ -1,4 +1,4 @@
-import { test, expect, afterEach, beforeEach } from "vitest";
+import { test, expect, afterEach, beforeEach, vi } from "vitest";
 import { setupServer } from "msw/node";
 import initApp from "../src/app";
 
@@ -13,9 +13,8 @@ afterEach(() => {
   server.close();
 });
 
-const app = initApp({ logger: false });
-
 test("/up route that always returns 200", async () => {
+  const app = await initApp({ logger: false });
   const response = await app.inject({
     method: "GET",
     url: "/up",
@@ -25,6 +24,7 @@ test("/up route that always returns 200", async () => {
 });
 
 test("/stores route that returns the list of stores", async () => {
+  const app = await initApp({ logger: false });
   const response = await app.inject({
     method: "GET",
     url: "/stores",
@@ -55,6 +55,7 @@ test("/stores route that returns the list of stores", async () => {
 });
 
 test("/stores/:id/menu route that returns the list of menu items", async () => {
+  const app = await initApp({ logger: false });
   const response = await app.inject({
     method: "GET",
     url: "/stores/1/menu",
