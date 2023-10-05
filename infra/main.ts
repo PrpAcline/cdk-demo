@@ -1,5 +1,5 @@
 import { App, Stack } from "aws-cdk-lib";
-import { NodejsFunction } from "aws-cdk-lib/aws-lambda-nodejs";
+import { NodejsFunction, OutputFormat } from "aws-cdk-lib/aws-lambda-nodejs";
 import {
   Architecture,
   FunctionUrl,
@@ -19,6 +19,10 @@ const lambda = new NodejsFunction(stack, "MyFunction", {
   entry: "src/lambda.ts",
   handler: "handler",
   architecture: Architecture.ARM_64,
+  bundling: {
+    target: "node18",
+    format: OutputFormat.ESM,
+  },
 });
 
 const url = new FunctionUrl(stack, "MyFunctionUrl", {
