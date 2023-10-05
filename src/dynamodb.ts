@@ -11,7 +11,7 @@ const getDynamoEndpoint = () => {
     return undefined;
   }
 
-  return "http://localhost:8000";
+  return undefined;
 };
 
 export const createDynamoDbClient = () => {

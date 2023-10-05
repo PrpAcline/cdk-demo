@@ -4,7 +4,8 @@ import * as ddb from "@aws-sdk/lib-dynamodb";
 import { createDynamoDbClient } from "./dynamodb.js";
 import swagger from "@fastify/swagger";
 import swaggerUI from "@fastify/swagger-ui";
-import { ulid } from "ulid";
+// @ts-ignore
+import * as uuid from "uuid";
 import { z } from "zod";
 
 const storeSchema = z.object({
@@ -94,7 +95,7 @@ const initApp = async (config: FastifyConfig) => {
       const body = storeSchema.omit({ id: true }).parse(request.body);
 
       const ddbItem = {
-        pk: ulid(),
+        pk: Math.random().toString(),
         sk: `STORE`,
         location: body.location,
       };
