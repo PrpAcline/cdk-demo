@@ -4,6 +4,7 @@ import {
   Architecture,
   FunctionUrl,
   FunctionUrlAuthType,
+  Runtime,
 } from "aws-cdk-lib/aws-lambda";
 
 const app = new App();
@@ -15,13 +16,16 @@ const stack = new Stack(app, "MyStack", {
   },
 });
 
-const lambda = new NodejsFunction(stack, "MyFunction", {
+const lambda = new NodejsFunction(stack, "api-function", {
+  functionName: "TacoApi",
   entry: "src/lambda.ts",
   handler: "handler",
+  runtime: Runtime.NODEJS_18_X,
   architecture: Architecture.ARM_64,
   bundling: {
     target: "node18",
     format: OutputFormat.ESM,
+    nodeModules: ["fastify", "@fastify/swagger", "@fastify/swagger-ui"],
   },
 });
 
